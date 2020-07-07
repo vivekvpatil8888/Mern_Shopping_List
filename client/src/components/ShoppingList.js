@@ -2,20 +2,20 @@ import React, { Component } from 'react';
 import { Container, ListGroup, ListGroupItem, Button } from 'reactstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import {v4 as uuid} from 'uuid';
+import { connect } from 'react-redux' ;
+import { getItems } from '../actions/itemActions';
+import PropTypes from 'prop-types';
 
 class ShoppingList extends Component {
-    state = {
-        items: [
-            { id:  uuid(), name: 'Eggs'}, 
-            { id:  uuid(), name: 'Milk'}, 
-            { id:  uuid(), name: 'Biscuits'}, 
-            { id:  uuid(), name: 'Cakes'}, 
 
-        ]
+    // Use this lifecycle method when calling api or
+    // so that it access the fully loaded page 
+    componentDidMount(){
+        this.props.getItems(); // Get all items as soon as
+                              // this component loads 
     }
-
     render(){
-        const { items } = this.state;
+        const { items } = this.props.item;
         return(
             <Container>
                 <Button
@@ -57,6 +57,20 @@ class ShoppingList extends Component {
     }
 }
 
+ShoppingList.propTypes = {
+    getItems: PropTypes.func.isRequired,
+    item: PropTypes.object.isRequired    
+}
 
-
-export default ShoppingList;
+// Your mapStateToProps functions are expected to return an object.
+// This object, normally referred to as stateProps, will be merged as props to your connected component. 
+// If you define mergeProps, it will be supplied as the first parameter to mergeProps.
+// The return of the mapStateToProps determine whether the connected component will re-render
+const mapStateToProps  = (state) => ({
+    item: state.item
+}) 
+// state.item is from itemReducer
+// item prop of ShoppingList is equal to state of itemReducer
+export default connect(mapStateToProps, { getItems })(ShoppingList);
+// {getItems} parameter property is of form 'Object Shorthand Form' for 
+// mapDispatchToProps parameter 
